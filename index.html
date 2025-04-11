@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Connectivity Checker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 2rem;
+      background: #f9f9f9;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2rem;
+      color: #004085;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      background-color: white;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+      padding: 0.75rem;
+      text-align: left;
+    }
+
+    td {
+      padding: 0.75rem;
+      border-bottom: 1px solid #ddd;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .status-checking {
+      color: orange;
+      font-weight: bold;
+    }
+
+    .status-success {
+      color: green;
+      font-weight: bold;
+    }
+
+    .status-failure {
+      color: red;
+      font-weight: bold;
+    }
+
+    #ip-section {
+      margin-top: 2rem;
+      font-size: 1.25rem;
+      text-align: center;
+      background-color: #e2e3e5;
+      padding: 1rem;
+      border-left: 5px solid #6c757d;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌐 URL Connectivity Checker</h1>
+
+  <div id="ip-section">Public IP: Checking...</div>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>URL</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="url-status-table"></tbody>
+  </table>
+
+
+  <script>
+    const urls = [
+      'http://www.ElliottElectric.com/robots.txt',
+      'https://www.ElliottElectric.com/robots.txt',
+      'http://api.ElliottElectric.com/robots.txt',
+      'https://api.ElliottElectric.com/robots.txt',
+	  'http://services.ElliottElectric.com/robots.txt',
+      'https://services.ElliottElectric.com/robots.txt',
+      'http://www.ElliottElectric.com/',
+      'https://www.ElliottElectric.com/',
+      'http://www.ElectricalSlang.com/robots.txt',
+      'http://www.NacSpace.com/robots.txt',
+      'https://www.NacSpace.com/robots.txt',
+      'http://199.38.25.203/robots.txt',
+      'https://www.google.com/robots.txt',
+      'https://example.org/'
+    ];
+
+    const tableBody = document.getElementById('url-status-table');
+
+    urls.forEach(url => {
+      const row = document.createElement('tr');
+      const urlCell = document.createElement('td');
+      const statusCell = document.createElement('td');
+      const link = document.createElement('a');
+      link.href = url;
+      link.textContent = url;
+      link.target = '_blank';
+      urlCell.appendChild(link);
+
+      statusCell.innerHTML = '⏳ Checking...';
+      statusCell.classList.add('status-checking');
+      row.appendChild(urlCell);
+      row.appendChild(statusCell);
+      tableBody.appendChild(row);
+
+      fetch(url, { method: 'HEAD', mode: 'no-cors' })
+        .then(response => {
+          statusCell.innerHTML = '✅ Success (no-cors mode assumed working)';
+          statusCell.classList.remove('status-checking');
+          statusCell.classList.add('status-success');
+        })
+        .catch(error => {
+          statusCell.innerHTML = '❌ Failed: ' + error.message;
+          statusCell.classList.remove('status-checking');
+          statusCell.classList.add('status-failure');
+        });
+    });
+
+    fetch('https://api.ipify.org?format=json')
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('ip-section').textContent = 'Public IP: ' + data.ip;
+      })
+      .catch(error => {
+        document.getElementById('ip-section').textContent = 'Public IP: Unable to retrieve';
+      });
+  </script>
+</body>
+</html>
