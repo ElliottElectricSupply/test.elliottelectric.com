@@ -26,6 +26,11 @@
       font-weight: bold;
     }
 
+    .status-skipped {
+      color: gray;
+      font-style: italic;
+    }
+
     #ip-section {
       margin-top: 2rem;
     }
@@ -33,7 +38,10 @@
 </head>
 <body>
   <div class="container">
-    <h1 class="text-center text-primary mb-4">🌐 URL Connectivity Checker</h1>
+    <h1 class="text-center text-primary mb-4">
+      <img src="images/EES-Logo_RGB-SingleColor-Reflex.png" alt="Elliott Electric Supply" height="48" style="vertical-align:middle;margin-right:0.5rem;">
+      URL Connectivity Checker
+    </h1>
 
     <div id="ip-section" class="alert alert-secondary text-center" role="alert">
       Public IP: Checking...
@@ -71,6 +79,7 @@
     ];
 
     const tableBody = document.getElementById('url-status-table');
+    const isHttps = location.protocol === 'https:';
 
     urls.forEach(url => {
       const row = document.createElement('tr');
@@ -83,11 +92,18 @@
       link.rel = 'noopener noreferrer';
       urlCell.appendChild(link);
 
-      statusCell.innerHTML = '⏳ Checking...';
-      statusCell.classList.add('status-checking');
       row.appendChild(urlCell);
       row.appendChild(statusCell);
       tableBody.appendChild(row);
+
+      if (isHttps && url.startsWith('http://')) {
+        statusCell.innerHTML = '⏭️ Skipped (HTTP not checked from HTTPS)';
+        statusCell.classList.add('status-skipped');
+        return;
+      }
+
+      statusCell.innerHTML = '⏳ Checking...';
+      statusCell.classList.add('status-checking');
 
       fetch(link.href, { method: 'HEAD', mode: 'no-cors' })
         .then(response => {
